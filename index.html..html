@@ -1,0 +1,1607 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mes fiches">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F4ECE0">
+<title>Mes fiches</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#312115;
+    --bark:#4E3826;
+    --leather:#8B6647;
+    --brass:#B58248;
+    --beige:#F4ECE0;
+    --sand:#E6D8C4;
+    --card:#FFFCF7;
+    --line:#E3D5C0;
+    --shadow:0 2px 14px rgba(70,45,25,.07);
+    --shadow-lift:0 8px 22px rgba(70,45,25,.13);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  #app{
+    font-family:'Karla',system-ui,-apple-system,sans-serif;
+    background:var(--beige);
+    color:var(--ink);
+    min-height:100vh;
+    padding:calc(14px + env(safe-area-inset-top)) 0 calc(80px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  #app h1,#app h2,#app h3{font-family:'Fraunces',Georgia,serif;font-weight:600;margin:0;letter-spacing:-.015em;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:var(--ink);}
+  #app .chap .t{color:var(--ink);}
+  button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2.5px solid var(--brass);outline-offset:3px;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px;}
+
+  /* ---------- en-tête flottant ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:13px;
+    background:var(--bark);color:var(--card);
+    border-radius:26px;
+    padding:16px 22px;
+    margin-bottom:20px;
+    box-shadow:var(--shadow-lift);
+  }
+  .topbar h1{font-size:clamp(21px,2.1vw,27px);color:var(--card);line-height:1.15;}
+  .topbar .sub{font-size:12.5px;color:#D6C2A6;margin-top:3px;}
+  .back{
+    width:38px;height:38px;flex:none;border-radius:50%;
+    background:rgba(255,252,247,.14);color:var(--card);
+    font-size:19px;line-height:1;display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease;
+  }
+  .back:hover{background:rgba(255,252,247,.28);}
+
+  /* ---------- tuiles matières ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(158px, 1fr));
+    gap:clamp(12px, 1.4vw, 18px);
+  }
+  .tile{
+    text-align:left;background:var(--card);
+    border-radius:24px;padding:clamp(16px,1.6vw,24px) clamp(14px,1.4vw,22px);
+    min-height:clamp(130px,13vw,170px);
+    display:flex;flex-direction:column;justify-content:space-between;
+    box-shadow:var(--shadow);
+    transition:transform .16s ease, box-shadow .16s ease;
+  }
+  .tile:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);}
+  .dot{
+    width:clamp(34px,3.4vw,44px);height:clamp(34px,3.4vw,44px);border-radius:15px;
+    background:var(--tab);margin-bottom:13px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-family:'Fraunces',Georgia,serif;font-size:clamp(15px,1.4vw,18px);font-weight:600;
+  }
+  .tile .name{font-family:'Fraunces',Georgia,serif;font-size:clamp(16.5px,1.7vw,20px);font-weight:600;line-height:1.2;color:var(--ink);}
+  .tile .count{font-size:clamp(12.5px,1.1vw,14px);color:var(--leather);margin-top:7px;}
+
+  /* ---------- chapitres ---------- */
+  .group{margin-bottom:34px;}
+  .subsec{margin:0 0 20px;padding-left:2px;}
+  .shead{
+    font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--leather);margin:0 0 11px;
+  }
+  .ghead{
+    font-family:'Fraunces',Georgia,serif;font-weight:700;
+    font-size:clamp(17px,1.6vw,20px);color:var(--ink);
+    margin:0 0 14px;padding-bottom:9px;border-bottom:2.5px solid var(--brass);
+  }
+  .gempty{
+    font-size:14px;color:var(--leather);padding:14px 2px 16px;
+  }
+  .chapters{list-style:none;margin:0;padding:0;}
+  .chap{
+    display:flex;align-items:center;gap:15px;width:100%;text-align:left;
+    background:var(--card);border-radius:22px;padding:16px 18px;margin-bottom:11px;
+    box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .chap:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift);}
+  .chap .num{
+    flex:none;width:38px;height:38px;border-radius:14px;
+    background:var(--sand);color:var(--bark);
+    font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .chap .t{font-size:15.5px;font-weight:600;line-height:1.3;display:block;}
+  .chap .meta{font-size:12.5px;color:var(--leather);margin-top:4px;display:block;}
+
+  /* ---------- fiche ---------- */
+  .fiche{background:#FFFFFF;border-radius:28px;padding:clamp(24px,3vw,44px) clamp(20px,3vw,46px);box-shadow:var(--shadow);}
+  .fiche h2{font-size:clamp(24px,2.6vw,31px);line-height:1.18;}
+  .fiche h2 .hlt{
+    background:linear-gradient(180deg,transparent 52%,#FFDF8E 52%,#FFDF8E 92%,transparent 92%);
+    padding:0 3px;
+  }
+  .pill{
+    display:inline-block;background:var(--sand);color:var(--bark);
+    border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:600;margin-bottom:11px;
+  }
+  .sect{margin-top:30px;}
+  .sect > h3{
+    font-size:16px;margin-bottom:15px;display:inline-block;
+    background:linear-gradient(180deg,transparent 55%,#D8E8C8 55%,#D8E8C8 94%,transparent 94%);
+    padding:0 5px 1px;
+  }
+  mark{
+    background:linear-gradient(180deg,transparent 50%,#FFE79C 50%,#FFE79C 93%,transparent 93%);
+    color:inherit;padding:0 2px;border-radius:1px;
+  }
+  .notion{
+    padding:0 0 0 15px;margin-bottom:17px;
+    border-left:4px solid #FFD766;border-radius:2px;
+  }
+  .notion dt{
+    font-weight:700;font-size:15px;display:inline;
+    background:linear-gradient(180deg,transparent 55%,#FFE79C 55%,#FFE79C 94%,transparent 94%);
+    box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:0 3px;
+  }
+  .notion dd{margin:7px 0 0;font-size:14.5px;line-height:1.6;color:#33291E;}
+  .prose{font-size:clamp(15px,1.25vw,17px);line-height:1.75;color:#33291E;white-space:pre-wrap;}
+  .essentiel{
+    margin-top:38px;padding-top:26px;border-top:3px double var(--sand);
+  }
+  .rlab{
+    font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:14px;
+    color:var(--bark);margin-bottom:11px;
+  }
+  .retenir{
+    background:#FFFDF6;border:1.5px solid #F0E2BC;border-radius:20px;padding:17px 20px;
+  }
+  .retenir ul{margin:0;padding-left:20px;}
+  .retenir li{font-size:14.5px;line-height:1.65;margin-bottom:10px;}
+  .retenir li::marker{color:#C79A3E;}
+  .retenir li:last-child{margin-bottom:0;}
+  .confirm{
+    background:#FBEDE7;border:1.5px solid #E8CFC4;border-radius:20px;
+    padding:15px 17px;margin-top:20px;
+  }
+  .confirm p{margin:0 0 12px;font-size:14.5px;color:#8E3A22;line-height:1.5;}
+  .err{
+    background:#FBEDE7;border-radius:16px;padding:11px 15px;margin-top:14px;
+    font-size:14px;color:#8E3A22;
+  }
+
+  /* ---------- schémas ---------- */
+  .shot{margin-bottom:16px;}
+  .shot img{
+    width:100%;display:block;border-radius:18px;border:1.5px solid var(--line);
+    background:#fff;cursor:zoom-in;
+  }
+  .shot .cap{font-size:13px;color:var(--leather);margin-top:7px;line-height:1.45;}
+  .lightbox{
+    position:fixed;inset:0;z-index:80;background:rgba(35,22,14,.92);
+    display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;
+  }
+  .lightbox img{max-width:100%;max-height:100%;border-radius:12px;}
+  .thumbs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px;}
+  .thumb{background:var(--card);border-radius:18px;padding:9px;box-shadow:var(--shadow);}
+  .thumb img{width:100%;height:92px;object-fit:cover;border-radius:12px;display:block;}
+  .thumb input.f{font-size:13px;padding:8px 10px;border-radius:12px;margin:8px 0;}
+  .filebtn{
+    display:inline-block;background:var(--sand);color:var(--bark);
+    border-radius:999px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .filebtn:hover{background:#DCCBB2;}
+  .filebtn input{display:none;}
+
+  /* ---------- tableaux ---------- */
+  .tbl{width:100%;border-collapse:separate;border-spacing:0;margin:16px 0;font-size:14px;}
+  .tbl th,.tbl td{
+    border-bottom:1px solid var(--line);padding:10px 11px;text-align:left;
+    line-height:1.5;vertical-align:top;
+  }
+  .tbl th{background:#F7EFE1;font-weight:700;font-size:13.5px;}
+  .tbl tr:last-child td{border-bottom:none;}
+  .tblwrap{overflow-x:auto;border:1.5px solid var(--line);border-radius:18px;}
+
+  /* ---------- schéma ---------- */
+  .schema{margin:20px 0 6px;}
+  .sbox{
+    border:2px solid var(--ink);border-radius:15px;background:#fff;
+    max-width:440px;margin:0 auto;overflow:hidden;
+  }
+  .sbox-t{
+    background:var(--ink);color:#FFFCF7;text-align:center;
+    font-weight:700;font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;
+    padding:8px 12px;
+  }
+  .sbox p{margin:10px 15px;font-size:14.5px;line-height:1.5;color:var(--ink);}
+  .snote{
+    border:2.5px dotted var(--leather);border-radius:16px;background:var(--beige);
+    max-width:440px;margin:14px auto;padding:13px 17px;
+  }
+  .snote .lab{font-weight:700;font-size:14px;margin-bottom:7px;}
+  .snote ul{margin:0;padding-left:19px;}
+  .snote li{font-size:14px;line-height:1.55;margin-bottom:4px;}
+  .snote li:last-child{margin-bottom:0;}
+  .sarrow{display:flex;flex-direction:column;align-items:center;margin:12px 0;}
+  .sarrow .line{width:4px;height:26px;background:var(--ink);}
+  .sarrow .head{
+    width:0;height:0;border-left:9px solid transparent;
+    border-right:9px solid transparent;border-top:13px solid var(--ink);
+  }
+  .sarrow .lbl{font-size:13px;font-weight:700;margin-top:7px;color:var(--bark);}
+  .srow{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));
+    gap:13px;max-width:520px;margin:0 auto;
+  }
+  .scard{border:2px solid var(--leather);border-radius:16px;background:#fff;padding:13px 15px;}
+  .scard .lab{font-weight:700;font-size:14.5px;margin-bottom:6px;color:var(--ink);}
+  .scard p{margin:0;font-size:14px;line-height:1.5;color:var(--bark);}
+
+
+  #app[data-mode="exos"]{
+    --ink:#232326;
+    --bark:#2B2B2E;
+    --leather:#6C6C74;
+    --brass:#8A8A94;
+    --beige:#E7E7EB;
+    --sand:#DBDBE1;
+    --card:#FFFFFF;
+    --line:#D7D7DD;
+    --shadow:0 2px 14px rgba(30,30,36,.07);
+    --shadow-lift:0 8px 22px rgba(30,30,36,.14);
+    background:#EEEEF0;
+  }
+  #app[data-mode="exos"] .topbar{border-bottom:none;}
+  #app[data-mode="exos"] .topbar .sub{color:#B6B6BE;}
+  #app[data-mode="exos"] .dot{border-radius:999px;}
+
+
+  .searchbox{margin-bottom:20px;}
+  .searchbox input.f{border-radius:999px;padding:14px 20px;font-size:15px;}
+  .reslist,.pinned{margin-bottom:22px;}
+  .resrow{
+    display:block;width:100%;text-align:left;background:var(--card);
+    border-radius:16px;padding:13px 16px;margin-bottom:9px;box-shadow:var(--shadow);
+  }
+  .resrow:hover{box-shadow:var(--shadow-lift);}
+  .rest{display:block;font-size:15px;font-weight:600;color:var(--ink);line-height:1.3;}
+  .resm{display:block;font-size:12.5px;color:var(--leather);margin-top:4px;}
+  .fhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .pinbtn{
+    flex:none;width:40px;height:40px;border-radius:50%;background:var(--beige);
+    font-size:19px;line-height:1;color:var(--leather);
+  }
+  .pinbtn.on{background:#FCEFC9;color:#B07D1A;}
+  .retry{
+    background:#FBEDE7;border-radius:20px;padding:16px 18px;margin-top:18px;text-align:center;
+  }
+  .retry .rlab{color:#8E3A22;margin-bottom:11px;}
+  .exo-q.trou{
+    font-family:'Karla',system-ui,sans-serif;font-weight:400;
+    font-size:clamp(16px,1.5vw,18px);line-height:2;
+  }
+
+  /* ---------- onglets Fiches / Exercices ---------- */
+  .tabs{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;
+    background:var(--sand);border-radius:999px;padding:6px;margin-bottom:24px;
+  }
+  .tab{
+    border-radius:999px;padding:13px 10px;font-size:15px;font-weight:700;
+    color:var(--leather);transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+  }
+  .tab.on{
+    background:var(--bark);color:var(--card);
+    box-shadow:0 3px 10px rgba(70,45,25,.22);
+  }
+
+  /* ---------- session d'exercices ---------- */
+  .pbar{
+    height:10px;background:var(--sand);border-radius:999px;overflow:hidden;margin-bottom:20px;
+  }
+  .pbar span{
+    display:block;height:100%;background:var(--brass);border-radius:999px;
+    transition:width .3s ease;
+  }
+  .exo{
+    background:#fff;border-radius:26px;box-shadow:var(--shadow-lift);
+    padding:clamp(22px,2.6vw,34px) clamp(18px,2.4vw,32px);margin-bottom:22px;
+  }
+  .exo.tapme{cursor:pointer;position:relative;}
+  .exo.tapme::after{
+    content:"Touche la carte pour voir la réponse";
+    display:block;margin-top:22px;text-align:center;
+    font-size:13px;color:var(--leather);font-style:italic;
+  }
+  .exo.tapme:hover{box-shadow:0 12px 30px rgba(70,45,25,.2);}
+  .exo-kind{
+    display:inline-block;background:var(--beige);color:var(--leather);
+    border-radius:999px;padding:6px 14px;margin-bottom:18px;
+    font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .exo-q{
+    font-family:'Fraunces',Georgia,serif;font-weight:600;
+    font-size:clamp(19px,2vw,24px);line-height:1.35;color:var(--ink);
+    white-space:pre-wrap;
+  }
+  .opts{display:flex;flex-direction:column;gap:11px;margin-top:22px;}
+  .opt{
+    display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+    background:var(--cream);border:2px solid var(--line);border-radius:18px;
+    padding:16px 17px;font-size:15.5px;line-height:1.4;color:var(--ink);
+    transition:border-color .15s ease,background .15s ease,transform .12s ease;
+  }
+  .opt::before{
+    content:counter(o);counter-increment:o;
+    flex:none;width:30px;height:30px;border-radius:10px;
+    background:var(--sand);color:var(--bark);
+    font-weight:700;font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .opts{counter-reset:o;}
+  .opt:not(:disabled):hover{border-color:var(--brass);transform:translateY(-2px);}
+  .opt.good{
+    background:#E9F2DD;border-color:#6E8C4A;color:#2F4220;font-weight:600;
+  }
+  .opt.good::before{background:#6E8C4A;color:#fff;content:"✓";}
+  .opt.bad{
+    background:#FBEAE3;border-color:#B4644A;color:#7E3620;
+  }
+  .opt.bad::before{background:#B4644A;color:#fff;content:"✕";}
+  .opt:disabled{cursor:default;}
+  .exo-a{
+    margin-top:22px;background:var(--beige);border-radius:18px;
+    padding:16px 18px;font-size:15px;line-height:1.65;color:var(--bark);
+  }
+  .alab{
+    font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:13px;
+    color:var(--leather);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;
+  }
+  .btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  /* ---------- niveaux du plan ---------- */
+  .h1p{
+    font-family:'Fraunces',Georgia,serif;font-weight:700;
+    font-size:clamp(18px,1.7vw,21px);line-height:1.25;color:var(--ink);
+    margin:30px 0 14px;padding:0 0 8px;border-bottom:2.5px solid var(--brass);
+  }
+  .h1p:first-child{margin-top:0;}
+  .h2p{
+    font-weight:700;font-size:clamp(15.5px,1.35vw,17px);color:var(--bark);
+    margin:24px 0 11px;padding-left:12px;border-left:4px solid #D8E8C8;
+  }
+  .q{
+    font-style:italic;font-size:clamp(14.5px,1.2vw,16px);color:var(--leather);
+    margin:0 0 12px;padding:9px 14px;background:var(--beige);border-radius:14px;
+  }
+  .h1p + .prose, .h2p + .prose, .q + .prose{margin-top:0;}
+  .plan{
+    background:var(--beige);border-radius:20px;padding:16px 20px;margin-top:22px;
+  }
+  .plan .lab{
+    font-family:'Fraunces',Georgia,serif;font-size:13px;font-weight:600;
+    color:var(--leather);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;
+  }
+  .plan ol{list-style:none;margin:0;padding:0;}
+  .plan li{font-size:14px;line-height:1.5;margin-bottom:7px;color:var(--bark);}
+  .plan li:last-child{margin-bottom:0;}
+  .plan li.l1{font-weight:700;color:var(--ink);}
+  .plan li.l2{padding-left:18px;font-size:13.5px;}
+
+  /* ---------- boutons ---------- */
+  .btn{
+    background:var(--bark);color:var(--card);
+    border-radius:999px;padding:13px 22px;font-size:14.5px;font-weight:600;
+    transition:background .15s ease, transform .15s ease;
+  }
+  .btn:hover{background:var(--ink);transform:translateY(-1px);}
+  .btn.ghost{background:var(--sand);color:var(--bark);}
+  .btn.ghost:hover{background:#DCCBB2;}
+  .btn.danger{background:#F1DFD8;color:#8E3A22;}
+  .btn.danger:hover{background:#E8CFC4;}
+  .btn.small{padding:9px 16px;font-size:13.5px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;}
+  .addbar{margin:20px 0 8px;}
+
+  /* ---------- éditeur ---------- */
+  label.f{display:block;font-size:13.5px;font-weight:700;margin:22px 0 8px;color:var(--bark);}
+  input.f,textarea.f{
+    width:100%;font-family:inherit;font-size:15px;color:var(--ink);
+    background:var(--card);border:1.5px solid var(--line);border-radius:18px;
+    padding:13px 15px;line-height:1.55;
+  }
+  input.f:focus,textarea.f:focus{border-color:var(--brass);}
+  textarea.f{resize:vertical;min-height:100px;}
+  .hint{font-size:12.5px;color:var(--leather);margin-top:7px;line-height:1.5;}
+  .npair{background:var(--card);border-radius:22px;padding:14px;margin-bottom:11px;box-shadow:var(--shadow);}
+  .npair input.f{margin-bottom:9px;}
+  .npair textarea.f{min-height:70px;margin-bottom:10px;}
+
+  .empty{
+    text-align:center;padding:44px 22px;color:var(--leather);
+    background:var(--card);border-radius:24px;box-shadow:var(--shadow);
+  }
+  .empty p{margin:0 0 5px;font-size:15.5px;color:var(--bark);font-weight:600;}
+  .empty .s{font-size:13.5px;}
+  .loading{text-align:center;padding:70px 20px;color:var(--leather);font-size:14px;}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+
+<div id="app"><div class="loading">Ouverture du classeur…</div></div>
+
+<script>
+const KEY = 'fiches-stmg-v1';
+
+const SUBJECTS = [
+  { id:'maths',      name:'Mathématiques',      tab:'#96663F', ini:'M'  },
+  { id:'francais',   name:'Français',            tab:'#AC4E34', ini:'Fr' },
+  { id:'anglais',    name:'Anglais',             tab:'#7E7038', ini:'An' },
+  { id:'espagnol',   name:'Espagnol',            tab:'#BA8940', ini:'Es' },
+  { id:'gestion',    name:'Sciences de gestion', tab:'#665233', ini:'SG' },
+  { id:'droit-eco',  name:'Droit & économie',    tab:'#74413A', ini:'DE' },
+  { id:'management', name:'Management',          tab:'#556242', ini:'Mg' },
+  { id:'histoire',   name:'Histoire-Géographie', tab:'#82505B', ini:'HG' },
+];
+
+const GROUPS = {
+  'droit-eco': ['Droit', 'Économie']
+};
+const KINDS = ['Synthèses', 'Méthodologie'];
+
+let data = {};
+
+const BASE = {
+  'maths': [
+    'Suites numériques',
+    'Fonctions polynômes du second degré',
+    'Dérivation et taux de variation',
+    'Statistiques à deux variables',
+    'Probabilités conditionnelles'
+  ],
+  'francais': [
+    'Le roman et le récit',
+    'Le théâtre',
+    'La poésie',
+    'La littérature d\u2019idées',
+    'Grammaire et outils d\u2019analyse'
+  ],
+  'anglais': [
+    'Identités et échanges',
+    'Espace privé et espace public',
+    'Art et pouvoir',
+    'Citoyenneté et mondes virtuels',
+    'Grammaire et expression'
+  ],
+  'espagnol': [
+    'Identités et échanges',
+    'Espace privé et espace public',
+    'Art et pouvoir',
+    'Citoyenneté et mondes virtuels',
+    'Grammaire et conjugaison'
+  ],
+  'gestion': [
+    'De l\u2019individu à l\u2019acteur',
+    'Numérique et intelligence collective',
+    'Création de valeur et performance',
+    'Temps et risque',
+    'Évaluation et performance'
+  ],
+  'droit-eco': [
+    'Qu\u2019est-ce que le droit ?',
+    'Comment le droit permet-il de régler un litige ?',
+    'Quels sont les droits reconnus aux personnes ?',
+    'Quelles sont les grandes questions économiques ?',
+    'Comment se crée et se répartit la richesse ?'
+  ],
+  'management': [
+    'À la rencontre du management des organisations',
+    'Les critères de différenciation des organisations',
+    'Les finalités et les objectifs',
+    'Le diagnostic stratégique',
+    'Les choix stratégiques'
+  ],
+  'histoire': [
+    'L\u2019Europe face aux révolutions',
+    'La France dans l\u2019Europe des nationalités',
+    'La Troisième République avant 1914',
+    'La métropolisation',
+    'Les espaces productifs et les espaces ruraux'
+  ]
+};
+let view = { screen:'home', subject:null, chapter:null };
+let draft = null;
+let pendingDelete = null;
+
+const el = document.getElementById('app');
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const hl = s => esc(s).replace(/==([^=]+)==/g, '<mark>$1</mark>');
+
+/* schéma : boîtes, flèches et encadrés */
+function renderSchema(rows){
+  let h = '<div class="schema">';
+  rows.forEach(r => {
+    const i = r.indexOf(':');
+    if (i < 0) return;
+    const k = r.slice(0, i).trim();
+    const cells = r.slice(i+1).split('|').map(c => c.trim()).filter(Boolean);
+    if (k === 'box'){
+      h += `<div class="sbox"><div class="sbox-t">${hl(cells[0]||'')}</div>` +
+           cells.slice(1).map(c => `<p>${hl(c)}</p>`).join('') + `</div>`;
+    } else if (k === 'note'){
+      h += `<div class="snote"><div class="lab">${hl(cells[0]||'')}</div><ul>` +
+           cells.slice(1).map(c => `<li>${hl(c)}</li>`).join('') + `</ul></div>`;
+    } else if (k === 'arrow'){
+      h += `<div class="sarrow"><span class="line"></span><span class="head"></span>` +
+           (cells[0] ? `<span class="lbl">${hl(cells[0])}</span>` : '') + `</div>`;
+    } else if (k === 'row'){
+      h += `<div class="srow">` + r.slice(i+1).split('||').map(card => {
+        const p = card.split('|').map(c => c.trim()).filter(Boolean);
+        return `<div class="scard"><div class="lab">${hl(p[0]||'')}</div>` +
+               p.slice(1).map(c => `<p>${hl(c)}</p>`).join('') + `</div>`;
+      }).join('') + `</div>`;
+    }
+  });
+  return h + '</div>';
+}
+
+/* synthèse : plan à plusieurs niveaux, questions, tableaux et texte */
+function prose(text){
+  const lines = String(text || '').split('\n');
+  let out = '', buf = [], tbl = [], sch = null;
+  const flushText = () => {
+    if (buf.join('').trim()) out += `<div class="prose">${hl(buf.join('\n').replace(/^\n+|\n+$/g,''))}</div>`;
+    buf = [];
+  };
+  const flushTbl = () => {
+    if (!tbl.length) return;
+    const rows = tbl.map(l => l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(c => c.trim()))
+                    .filter(r => !r.every(c => /^:?-{2,}:?$/.test(c)));
+    tbl = [];
+    if (!rows.length) return;
+    const head = rows.shift();
+    out += `<div class="tblwrap"><table class="tbl"><thead><tr>` +
+      head.map(c => `<th>${hl(c)}</th>`).join('') + `</tr></thead><tbody>` +
+      rows.map(r => `<tr>` + r.map(c => `<td>${hl(c)}</td>`).join('') + `</tr>`).join('') +
+      `</tbody></table></div>`;
+  };
+  lines.forEach(l => {
+    const t = l.trim();
+    if (t === '[schema]'){ flushTbl(); flushText(); sch = []; return; }
+    if (t === '[/schema]'){ if (sch) out += renderSchema(sch); sch = null; return; }
+    if (sch){ sch.push(t); return; }
+    if (/^##\s+/.test(t)){ flushTbl(); flushText(); out += `<div class="h2p">${hl(t.replace(/^##\s+/,''))}</div>`; return; }
+    if (/^#\s+/.test(t)) { flushTbl(); flushText(); out += `<div class="h1p">${hl(t.replace(/^#\s+/,''))}</div>`; return; }
+    if (/^\?\s+/.test(t)){ flushTbl(); flushText(); out += `<div class="q">${hl(t.replace(/^\?\s+/,''))}</div>`; return; }
+    if (/^\|/.test(t))   { flushText(); tbl.push(l); return; }
+    flushTbl(); buf.push(l);
+  });
+  flushText(); flushTbl();
+  return out;
+}
+
+/* plan du chapitre, extrait des titres */
+function planOf(text){
+  return String(text || '').split('\n').map(l => l.trim())
+    .filter(t => /^##?\s+/.test(t))
+    .map(t => ({ lvl: /^##\s/.test(t) ? 2 : 1, txt: t.replace(/^##?\s+/, '') }));
+}
+
+/* photo redimensionnée pour tenir dans le stockage */
+function compress(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = rej;
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        const max = 1000;
+        let w = img.width, h = img.height;
+        if (w > max || h > max){ const k = max / Math.max(w,h); w = Math.round(w*k); h = Math.round(h*k); }
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        res(cv.toDataURL('image/jpeg', 0.68));
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+const subj = id => SUBJECTS.find(s => s.id === id);
+const chaps = id => data[id] || [];
+
+/* stockage : celui de Claude si présent, sinon celui du navigateur */
+/* ---- Fiches intégrées au fichier : toujours présentes à l'ouverture ---- */
+const SEED = {
+  'gestion': [
+    {
+      id:'sg1',
+      theme:"Thème 1 · De l'individu à l'acteur",
+      title:"Chapitre 1",
+      notions:[
+        { term:'Capital social',
+          def:"La somme des apports que les associés ou actionnaires ont dans la société." },
+        { term:'Actionnaires ou associés',
+          def:"Les détenteurs de parts (sociales) ou d'actions de l'entreprise." },
+        { term:'Parties prenantes',
+          def:"Les personnes qui prennent part à l'activité de l'entreprise." },
+        { term:'AGO et AGE',
+          def:"Assemblée générale ordinaire et assemblée générale extraordinaire. C'est la délégation légale." },
+        { term:'Comex',
+          def:"Le comité exécutif." },
+        { term:'Les indicateurs',
+          def:"La production et la productivité." }
+      ],
+      synthese:
+"# I - Les différents types d'organisation\n"+
+"| Organisation | Ce qu'elle regroupe | But | Intérêt |\n"+
+"| ==Publique== | Administration centrale : l'État. Administration décentralisée : CR, CD, commune / ville | Non lucratif | ==Général== |\n"+
+"| ==Privée== | L'entreprise, la société commerciale | ==Lucratif== | ==Privé== |\n"+
+"| ==Société civile== | Les associations, les fondations | Non lucratif | ==Personnel==, à la personne adhérente |\n"+
+"# II - Savoir les différencier\n"+
+"Deux critères suffisent :\n"+
+"le ==but lucratif== (générer des profits) ou ==non lucratif== ;\n"+
+"==l'intérêt== : privé, général ou personnel.\n"+
+"# III - Qui décide et qui met en œuvre\n"+
+"| | Privée | Publique | Société civile |\n"+
+"| Oriente | Le ==président== donne une orientation stratégique de l'entreprise | Le ==président== donne une orientation stratégique de l'État français | Le ==président== donne une orientation stratégique de son association |\n"+
+"| Met en œuvre | Le ==directeur général== met en œuvre les décisions stratégiques du président | Le ==Premier ministre== met en œuvre les orientations stratégiques de son président | Le ==bureau==, directeur trésorier (financement) |\n"+
+"| Financement | — | Les finances de la France, qui proviennent des ==impôts des Français== | Les ==cotisations des adhérents== |\n"+
+"| Motivation | La ==prime==, facteur de motivation. L'indicateur est un chiffre | La ==fierté==, motivation intérieure | — |\n"+
+"Le président représente la France à l'étranger et il est chef des armées. Le Premier ministre est chef du gouvernement.\n"+
+"Exemples d'orientation : Yoplait, lutter contre la malnutrition infantile. LVMH, apporter le luxe français dans le monde.\n"+
+"# IV - Les ressources de l'organisation\n"+
+"La personne morale dispose de ==ressources humaines== (DRH) et de ==ressources financières==.\n"+
+"==Ressources humaines== : les salariés. Sont cités les dirigeants, les banquiers, les investisseurs et les fournisseurs.\n"+
+"==Ressources financières== : les banquiers, les investisseurs, les bénéfices générés, la productivité.\n"+
+"Les salariés sont des ==parties prenantes== : les personnes qui prennent part à l'activité de l'entreprise.\n"+
+"Quand une entreprise produit, elle fabrique. Les ==indicateurs== sont la production et la productivité.\n"+
+"# V - Le capital social\n"+
+"Les actionnaires ou associés de l'entreprise sont ==détenteurs de parts (sociales) ou d'actions==.\n"+
+"Le ==capital social== représente la somme des apports que les associés ou actionnaires ont dans la société.\n"+
+"Exemple du cours : un capital de 200 000 € détenu à hauteur de 90 % par les 2 actionnaires, soit 100 000 € chacun. Les actionnaires et dirigeants apportent les ==apports== et reçoivent les ==profits== (RH et RF).\n"+
+"# VI - L'assemblée des actionnaires\n"+
+"Délégation légale : ==AGO== (assemblée générale ordinaire) et ==AGE== (assemblée générale extraordinaire).\n"+
+"| 1. Actionnaires | 2. Président (comex) | 3. Assemblée générale |\n"+
+"| Détenteurs des actions → les ==apports== | Directeur général, DAF, DRH, directeur des ventes, directeur marketing, directeur de la production → ==projet commun== | De tous les actionnaires, qui vont apporter ou pas des orientations stratégiques du président |",
+      retenir:
+"Trois types d'organisation : publique, privée, société civile\n"+
+"Deux critères pour les différencier : le but (lucratif ou non) et l'intérêt (privé, général, personnel)\n"+
+"Privée = but lucratif et intérêt privé / Publique = intérêt général / Société civile = intérêt personnel\n"+
+"Le président oriente, le directeur général ou le Premier ministre met en œuvre\n"+
+"Financement : impôts des Français pour le public, cotisations des adhérents pour la société civile\n"+
+"Capital social = somme des apports des associés ou actionnaires\n"+
+"AGO = assemblée générale ordinaire, AGE = assemblée générale extraordinaire",
+      exos:[
+        { type:'qcm', q:"Quel est l'intérêt poursuivi par une organisation de la société civile ?",
+          options:["Général","Privé","Personnel, à la personne adhérente"], correct:2 },
+        { type:'qcm', q:"D'où proviennent les finances de la France ?",
+          options:["Des cotisations des adhérents","Des impôts des Français","Des apports des actionnaires"], correct:1 },
+        { type:'qcm', q:"Dans une organisation privée, qui met en œuvre les décisions stratégiques du président ?",
+          options:["Le Premier ministre","Le directeur général","Le bureau"], correct:1 },
+        { type:'qcm', q:"Que représente le capital social ?",
+          options:["Les bénéfices générés par l'entreprise","La somme des apports des associés ou actionnaires","Le montant des impôts versés"], correct:1 },
+        { type:'qcm', q:"Que signifie AGE ?",
+          options:["Assemblée générale extraordinaire","Assemblée générale élargie","Assemblée générale des entreprises"], correct:0 }
+      ],
+      images:[]
+    }
+  ],
+  'droit-eco': [
+    {
+      id:'drm1',
+      group:'Droit',
+      kind:'Méthodologie',
+      title:"Qualifier juridiquement les faits",
+      notions:[
+        { term:'Qualification juridique',
+          def:"Traduire une situation de la vie courante en termes juridiques. C'est toujours la première question de l'épreuve de droit." },
+        { term:'Catégorie juridique',
+          def:"Ensemble de personnes ou d'éléments qui présentent des caractéristiques semblables et obéissent au même régime de règles." },
+        { term:'Personne physique / personne morale',
+          def:"Un individu / une société ou une association." },
+        { term:'Demandeur / défendeur',
+          def:"Celui qui saisit le juge / celui qui est assigné en justice." },
+        { term:'Victime / auteur du dommage',
+          def:"Celui qui subit le dommage / celui qui le cause." }
+      ],
+      synthese:
+"# Étape 1 - Qualifier les acteurs\n"+
+"| Dans la situation | Qualification |\n"+
+"| Un individu | Personne ==physique== |\n"+
+"| Un individu de moins de 18 ans | ==Mineur== |\n"+
+"| Une société, une association | Personne ==morale== |\n"+
+"| Travail subordonné envers un employeur | ==Salarié== |\n"+
+"| Celui qui emploie | ==Employeur== |\n"+
+"| Achète un bien pour son usage | ==Consommateur== |\n"+
+"| Vend des biens ou services par métier | ==Professionnel== |\n"+
+"| Possède un bien | ==Propriétaire== |\n"+
+"| Saisit le juge | ==Demandeur== |\n"+
+"| Est assigné en justice | ==Défendeur== |\n"+
+"| Subit un dommage | ==Victime== |\n"+
+"| Cause un dommage | ==Auteur du dommage== |\n"+
+"| A vu les faits et peut être entendu | ==Témoin== |\n"+
+"⚠ Un même acteur peut cumuler plusieurs qualifications : un adolescent est à la fois personne physique et mineur. Au brouillon, note tous les termes possibles ; sur la copie, garde seulement ceux qui servent au litige.\n"+
+"# Étape 2 - Qualifier les événements\n"+
+"Il s'agit de nommer la relation, le fait ou le document à l'origine du litige.\n"+
+"| Dans la situation | Qualification |\n"+
+"| Une personne s'oblige envers une autre | ==Contrat== |\n"+
+"| Relation de travail subordonnée | ==Contrat de travail== |\n"+
+"| Relation entre un consommateur et un professionnel | ==Contrat de consommation== |\n"+
+"| Un préjudice subi par une personne | ==Dommage== |\n"+
+"| Acte rédigé par un officier public ou ministériel | ==Acte authentique== |\n"+
+"| Une partie reconnaît un fait ou un acte | ==Aveu== |\n"+
+"# Étape 3 - Réécrire la situation en langage juridique\n"+
+"On reprend la situation de départ en remplaçant chaque élément par sa qualification.\n"+
+"## Exemple\n"+
+"Situation : les arbres du voisin de Pierre ont tellement poussé que son jardin est à l'ombre toute la journée. Il demande qu'ils soient coupés.\n"+
+"Rédaction attendue : Pierre est une ==personne physique propriétaire d'un bien immeuble==. Son voisin, également propriétaire d'un bien immeuble, lui cause un ==trouble anormal de voisinage==, la hauteur des arbres empêchant l'ensoleillement de son terrain.",
+      retenir:
+"Qualifier = traduire les faits en termes juridiques, toujours en premier\n"+
+"Trois temps : les acteurs, puis les événements, puis la réécriture complète\n"+
+"Un acteur peut cumuler plusieurs qualifications : tout lister au brouillon, trier sur la copie\n"+
+"La qualification commande le droit applicable, donc les règles, donc l'argumentation\n"+
+"Demandeur = saisit le juge / Défendeur = est assigné",
+      exos:[
+        { type:'qcm', q:"Marc achète un lave-linge en magasin pour équiper sa maison. Comment le qualifier ?",
+          options:["Un professionnel","Un consommateur","Un salarié","Une personne morale"], correct:1,
+          a:"Il achète un bien pour son usage personnel auprès d'un vendeur professionnel : c'est un consommateur. Il est aussi une personne physique." },
+        { type:'qcm', q:"Devant le juge, une partie reconnaît avoir signé le document litigieux. Comment qualifier cette reconnaissance ?",
+          options:["Un témoignage","Un acte authentique","Un aveu","Un dommage"], correct:2,
+          a:"L'aveu est la reconnaissance, par une partie elle-même, de l'existence d'un fait ou d'un acte." },
+        { type:'qcm', q:"Qui est le défendeur ?",
+          options:["Celui qui saisit le juge","Celui qui est assigné en justice","Celui qui a vu les faits","Celui qui subit le dommage"], correct:1,
+          a:"Le demandeur saisit, le défendeur se défend. Ne pas confondre avec victime et auteur du dommage, qui qualifient les faits et non la procédure." },
+        { type:'libre', q:"Agathe, 93 ans, achète n'importe quoi au centre commercial et vient de signer un devis de 50 000 € pour refaire le chauffage de sa maison. Ses enfants la pensent hors d'état de mesurer ses actes et cherchent à la protéger.\nQualifie Agathe, les actes qu'elle passe, et la demande de ses enfants.",
+          a:"Agathe est une ==personne physique==. Elle achète des biens pour son usage : c'est une ==consommatrice==, face à des ==professionnels==. Les achats et le devis signé sont des ==contrats de consommation==. Ses enfants ne sont pas parties au litige : ils sont les personnes qui s'inquiètent pour elle." },
+      ],
+      images:[]
+    },
+    {
+      id:'dr1',
+      group:'Droit',
+      kind:'Synthèses',
+      theme:"Thème 1 · Qu'est-ce que le droit ?",
+      title:"Le droit, ses fonctions et la règle de droit",
+      notions:[
+        { term:'Liberté', def:"Droit de faire ce qui ne nuit pas à autrui." },
+        { term:'Égalité', def:"Tous les citoyens sont égaux face à la justice." },
+        { term:'Fraternité', def:"Agir dans un esprit de solidarité et d'entraide." },
+        { term:'Laïcité', def:"Liberté de choisir ou non sa religion et de la pratiquer ou non. Principe de neutralité." },
+        { term:'Morale', def:"Conscience individuelle du bien et du mal. À la différence du droit, elle n'est pas écrite et n'est pas sanctionnée." },
+        { term:'Article 49.3', def:"Le Premier ministre engage la responsabilité de son gouvernement : le projet de loi est adopté sans vote, sauf si une motion de censure est votée à la majorité absolue de l'Assemblée nationale." }
+      ],
+      synthese:
+"# I - Comment le droit permet-il de transmettre les valeurs de la société ?\n"+
+"Les grandes valeurs de la société française :\n"+
+"Liberté : droit de faire ce qui ne nuit pas à autrui.\n"+
+"Égalité : tous les citoyens sont égaux face à la justice.\n"+
+"Fraternité : agir dans un esprit de solidarité et d'entraide.\n"+
+"Laïcité : liberté de choisir ou non sa religion, de la pratiquer ou non — ==neutralité==.\n"+
+"Le droit permet de protéger ces valeurs car il met en place des ==règles juridiques==.\n"+
+"? Comment distinguer la morale du droit ?\n"+
+"La morale est la ==conscience individuelle du bien et du mal==.\n"+
+"Le droit, lui, ce sont des ==règles écrites et des obligations== censées défendre nos valeurs.\n"+
+"Le droit évolue pour rester en accord avec la morale et les valeurs de la société.\n"+
+"# II - Quelles sont les fonctions du droit ?\n"+
+"## A - Organiser la vie en société\n"+
+"Déterminer des règles de fonctionnement en collectivité, pour permettre une vie commune ordonnée et respectueuse, dans ==l'intérêt général==.\n"+
+"## B - Pacifier les relations sociales\n"+
+"Éviter les conflits, proposer une résolution par ==une personne neutre== et appliquer des ==sanctions équitables==, afin de maintenir la paix sociale.\n"+
+"# III - Quels sont les caractères de la règle de droit ?\n"+
+"| La règle de droit est… | Cela signifie que |\n"+
+"| ==Légitime== | Elle émane d'une autorité compétente, qui a le pouvoir d'adopter la règle |\n"+
+"| ==Générale== | Elle s'applique à tout le monde |\n"+
+"| ==Obligatoire== | Il y a obligation de la respecter, sous peine de sanction |\n"+
+"# IV - Comment une loi est-elle élaborée ?\n"+
+"## A - Les étapes\n"+
+"==L'initiative== : rédaction du projet de loi (gouvernement) ou de la proposition de loi (parlementaires).\n"+
+"==Dépôt et examen== : le dossier de loi est déposé et examiné par l'Assemblée nationale ou le Sénat.\n"+
+"==Débat et vote par le Parlement==.\n"+
+"==Navette parlementaire== : aller-retour entre l'Assemblée nationale et le Sénat, pour arriver à un texte identique.\n"+
+"==Promulgation== : la loi est signée par le Président, ce qui la rend officielle.\n"+
+"==Publication et entrée en vigueur== : la loi est publiée au Journal officiel de la République française.\n"+
+"## B - L'article 49.3\n"+
+"Dans le parcours habituel, une loi est débattue et votée. Le recours à l'article 49.3 modifie cette règle : il permet de passer outre le débat, le vote et la navette parlementaire.\n"+
+"Le ==Premier ministre engage la responsabilité de son gouvernement==. Le projet de loi est alors adopté ==sans faire l'objet d'un vote==, à moins qu'une ==motion de censure== soit votée par la ==majorité absolue== de l'Assemblée nationale.",
+      retenir:
+"Valeurs transmises par le droit : liberté, égalité, fraternité, laïcité\n"+
+"Morale = individuelle et non sanctionnée / Droit = écrit, obligatoire et sanctionné\n"+
+"Deux fonctions du droit : organiser la vie en société et pacifier les relations sociales\n"+
+"Trois caractères de la règle de droit : légitime, générale, obligatoire\n"+
+"Les six étapes de la loi : initiative, dépôt et examen, débat et vote, navette, promulgation, publication\n"+
+"49.3 : adoption sans vote, sauf motion de censure votée à la majorité absolue",
+      exos:[
+        { type:'qcm', q:"Quel caractère de la règle de droit signifie qu'elle s'applique à tout le monde ?",
+          options:["Légitime","Générale","Obligatoire"], correct:1,
+          a:"Légitime = elle émane d'une autorité compétente. Obligatoire = on doit la respecter sous peine de sanction." },
+        { type:'qcm', q:"Après le recours à l'article 49.3, que devient le projet de loi ?",
+          options:["Il est voté à la majorité absolue","Il est adopté sans vote, sauf motion de censure","Il retourne au Sénat","Il est abandonné"], correct:1,
+          a:"Seule une motion de censure votée à la majorité absolue de l'Assemblée nationale peut s'y opposer." },
+        { type:'qcm', q:"Quelle étape rend la loi officielle ?",
+          options:["La navette parlementaire","La promulgation","Le dépôt","Le débat"], correct:1,
+          a:"La promulgation est la signature du Président. La publication au Journal officiel vient ensuite et permet l'entrée en vigueur." },
+        { type:'qcm', q:"Qu'est-ce qui distingue le droit de la morale ?",
+          options:["Le droit est écrit, obligatoire et sanctionné","La morale est écrite et sanctionnée","Les deux ont exactement la même force"], correct:0,
+          a:"La morale est la conscience individuelle du bien et du mal. Le droit évolue pour rester en accord avec elle." },
+        { type:'qcm', q:"Quelles sont les deux fonctions du droit ?",
+          options:["Punir et réparer","Organiser la vie en société et pacifier les relations sociales","Légiférer et juger"], correct:1 }
+      ],
+      images:[]
+    }
+  ],
+  'management': [
+    {
+      id:'mg1',
+      title:"De l'action individuelle à l'action collective",
+      notions:[
+        { term:'Action individuelle',
+          def:"Action menée par une seule personne, qui poursuit son propre objectif et agit de façon indépendante et autonome." },
+        { term:'Action collective',
+          def:"Action menée par plusieurs personnes réunies autour d'un objectif commun. Son enjeu : l'efficacité et la productivité." },
+        { term:'Organisation',
+          def:"Action collective qui s'est formalisée. Trois types : l'entreprise privée (générer des profits), l'organisation publique (servir l'intérêt général), l'organisation de la société civile ou OSC (satisfaire l'intérêt de ses adhérents et/ou d'une partie de la population)." },
+        { term:'Statuts',
+          def:"Document qui fixe les règles de fonctionnement de l'organisation. Déposés au tribunal de commerce ou à la préfecture — ou fixés par la loi ou un décret pour une organisation publique." },
+        { term:'Personnalité juridique',
+          def:"Capacité, donnée par le statut juridique, d'être titulaire de droits et d'obligations." },
+        { term:'Ressource',
+          def:"Actif (élément, moyen) dont on dispose et qui peut être utilisé pour répondre à un besoin ou atteindre un objectif. Quatre types : matérielle, immatérielle, financière, humaine." },
+        { term:'Compétence',
+          def:"Le savoir-faire mobilisé dans l'organisation." }
+      ],
+      synthese:
+"# I - De l'action individuelle à l'action collective\n"+
+"## A - La distinction entre action individuelle et action collective\n"+
+"? Comment distinguer l'action individuelle de l'action collective ?\n"+
+"L'action individuelle concerne ==une seule personne==, qui a son propre objectif, agit indépendamment et en autonomie.\n"+
+"À l'inverse, l'action collective concerne ==plusieurs personnes ayant un objectif commun==.\n"+
+"## B - Les enjeux de l'action collective\n"+
+"? Pourquoi l'action collective est-elle plus efficace ?\n"+
+"Elle permet d'avoir recours à ==plus de ressources et de compétences==.\n"+
+"On peut réaliser une action d'une plus grande ampleur, en moins de temps, en ==se répartissant les tâches==.\n"+
+"On a aussi plus de pouvoir : on pèse plus lourd dans les négociations et face à la concurrence.\n"+
+"# II - L'organisation de l'action collective\n"+
+"## A - Devenir une organisation\n"+
+"? Comment une action collective devient-elle une organisation ?\n"+
+"Trois conditions : ==statuts formalisés==, ==objectif commun==, ==mobilisation de ressources==.\n"+
+"| Type d'organisation | But |\n"+
+"| Entreprise ==privée== | Générer des profits |\n"+
+"| Organisation ==publique== | Servir l'intérêt général |\n"+
+"| ==OSC== (société civile) | Satisfaire ses adhérents ou une partie de la population |\n"+
+"Les ==statuts== fixent les règles de fonctionnement et donnent la ==personnalité juridique== : l'organisation devient titulaire de droits et d'obligations.\n"+
+"## B - Les ressources\n"+
+"? Qu'est-ce qu'une ressource ?\n"+
+"Un ==actif== dont on dispose pour répondre à un besoin ou atteindre un objectif.\n"+
+"| Ressource | C'est-à-dire | Exemples |\n"+
+"| ==Matérielle== | Tangible, on peut la toucher | Locaux, produits |\n"+
+"| ==Immatérielle== | Sans existence physique | Marque, savoir-faire |\n"+
+"| ==Financière== | Apport en argent | Chiffre d'affaires, crédit |\n"+
+"| ==Humaine== | Apport en compétences | Salariés, postes, fonctions |\n"+
+"Leur combinaison fait ==fonctionner== l'organisation et assure sa ==pérennité==.\n"+
+"## C - La coordination des membres\n"+
+"? Comment les membres se coordonnent-ils ?\n"+
+"Ils se ==répartissent les tâches== et les articulent de manière ==cohérente==. La ==communication== est centrale : réunions, outils numériques.\n"+
+"## D - Schéma récapitulatif\n"+
+"[schema]\n"+
+"box: Action collective | = plusieurs personnes ont un objectif commun | Enjeu : ==efficacité== et ==productivité==\n"+
+"note: Conditions | Objectif commun | Cadre légal | Mobiliser des ressources | → pérennité\n"+
+"arrow:\n"+
+"box: Organisation | Trois types : privée · publique · société civile\n"+
+"arrow: A besoin de\n"+
+"row: Ressources | Financières · Humaines | Matérielles · Immatérielles || Compétences | = le savoir-faire\n"+
+"[/schema]",
+      retenir:
+"Action individuelle = une personne, un objectif personnel, de l'autonomie\n"+
+"Action collective = plusieurs personnes, un objectif commun\n"+
+"L'action collective apporte plus de ressources, de compétences et de pouvoir de négociation\n"+
+"La répartition des tâches permet de faire plus, en moins de temps\n"+
+"Trois conditions pour devenir une organisation : statuts formalisés, objectif commun, mobilisation de ressources\n"+
+"Trois types d'organisation : entreprise privée (profit), organisation publique (intérêt général), OSC (intérêt des adhérents)\n"+
+"Quatre types de ressources : matérielle, immatérielle, financière, humaine\n"+
+"Le statut juridique donne la personnalité juridique : droits et obligations\n"+
+"La coordination passe avant tout par la communication",
+      exos:[
+        { type:'qcm', q:"Quelles sont les trois conditions pour qu'une action collective devienne une organisation ?",
+          options:["Objectif commun, statuts formalisés, mobilisation de ressources","Objectif commun, profit, salariés","Statuts, capital, clients"], correct:0 },
+        { type:'qcm', q:"Quel est le but d'une organisation de la société civile (OSC) ?",
+          options:["Générer des profits","Servir l'intérêt général","Satisfaire ses adhérents ou une partie de la population"], correct:2,
+          a:"Le profit est le but de l'entreprise privée, l'intérêt général celui de l'organisation publique." },
+        { type:'qcm', q:"La marque d'une entreprise est une ressource…",
+          options:["Matérielle","Immatérielle","Financière","Humaine"], correct:1,
+          a:"Elle n'a pas d'existence physique, comme le savoir-faire." },
+        { type:'qcm', q:"Que donne le statut juridique à l'organisation ?",
+          options:["La personnalité juridique","Un chiffre d'affaires","Des salariés"], correct:0,
+          a:"Elle devient titulaire de droits et d'obligations." },
+        { type:'qcm', q:"Qu'est-ce qui tient une place centrale dans la coordination des membres ?",
+          options:["La hiérarchie","La communication","Le règlement intérieur"], correct:1,
+          a:"Elle s'opère par des réunions, des outils numériques, etc." }
+      ],
+      images:[]
+    }
+  ]
+};
+
+function mergeSeed(){
+  Object.keys(SEED).forEach(sid => {
+    if (!data[sid]) data[sid] = [];
+    SEED[sid].forEach(seedChap => {
+      if (!data[sid].some(c => c.id === seedChap.id)){
+        data[sid].unshift(JSON.parse(JSON.stringify(seedChap)));
+      }
+    });
+  });
+}
+
+let backend = null;          // 'claude' | 'local' | 'memory'
+const memoryStore = {};
+
+async function pickBackend(){
+  try{
+    if (window.storage){
+      const r = await window.storage.set('__probe', '1');
+      if (r){ backend = 'claude'; return; }
+    }
+  }catch(e){}
+  try{
+    localStorage.setItem('__probe', '1');
+    localStorage.removeItem('__probe');
+    backend = 'local'; return;
+  }catch(e){}
+  backend = 'memory';
+}
+
+const store = {
+  async get(k){
+    if (backend === 'claude'){
+      try{ return await window.storage.get(k); }catch(e){ return null; }
+    }
+    if (backend === 'local'){
+      const v = localStorage.getItem(k);
+      return v ? { key:k, value:v } : null;
+    }
+    return memoryStore[k] ? { key:k, value:memoryStore[k] } : null;
+  },
+  async set(k, v){
+    if (backend === 'claude') return await window.storage.set(k, v);
+    if (backend === 'local'){ localStorage.setItem(k, v); return { key:k, value:v }; }
+    memoryStore[k] = v;
+    return { key:k, value:v };
+  }
+};
+
+async function load(){
+  await pickBackend();
+  try{
+    const r = await store.get(KEY);
+    data = r && r.value ? JSON.parse(r.value) : {};
+  }catch(e){ data = {}; }
+  if (data.droit || data.economie){
+    data['droit-eco'] = (data['droit-eco']||[]).concat(data.droit||[], data.economie||[]);
+    delete data.droit; delete data.economie;
+    save(true);
+  }
+  if (!data._nobase){
+    Object.keys(BASE).forEach(sid => {
+      if (!data[sid]) return;
+      data[sid] = data[sid].filter(c =>
+        !(BASE[sid].indexOf(c.title) !== -1
+          && !(c.notions||[]).length && !c.synthese && !c.retenir));
+    });
+    delete data._base;
+    data._nobase = true;
+    save(true);
+  }
+  mergeSeed();
+  render();
+}
+function toast(msg, ok){
+  const old = document.getElementById('toast');
+  if (old) old.remove();
+  const b = document.createElement('div');
+  b.id = 'toast';
+  b.textContent = msg;
+  b.style.cssText = 'position:fixed;left:16px;right:16px;bottom:18px;z-index:90;'
+    + 'border-radius:16px;padding:13px 16px;font-family:Karla,sans-serif;font-size:14px;'
+    + 'line-height:1.5;text-align:center;box-shadow:0 8px 22px rgba(70,45,25,.25);'
+    + (ok ? 'background:#E7F0DC;color:#3E5228;' : 'background:#FBEDE7;color:#8E3A22;');
+  document.body.appendChild(b);
+  setTimeout(() => { if (b.parentNode) b.remove(); }, ok ? 2200 : 8000);
+}
+
+async function save(silent){
+  const payload = JSON.stringify(data);
+  try{
+    if (!window.storage && !window.localStorage) throw new Error('aucun stockage disponible');
+    const res = await store.set(KEY, payload);
+    if (!res) throw new Error('le stockage a refusé');
+    const back = await store.get(KEY);
+    if (!back || back.value !== payload) throw new Error('la relecture ne correspond pas');
+    if (!silent) toast(backend === 'memory'
+      ? 'Attention : rien n\u2019est conservé, tout sera perdu en fermant.'
+      : 'Enregistré', backend !== 'memory');
+    return true;
+  }catch(e){
+    const ko = Math.round(payload.length / 1024);
+    toast('Échec de l\u2019enregistrement (' + ko + ' Ko) — ' + (e.message || e)
+      + '. Recopie ton texte ailleurs avant de fermer.', false);
+    return false;
+  }
+}
+
+function go(v){ pendingDelete = null; view = Object.assign({screen:'home',subject:null,chapter:null}, v); window.scrollTo(0,0); render(); }
+
+function render(){
+  el.dataset.mode = mode;
+  if (view.screen === 'home')    return renderHome();
+  if (view.screen === 'subject') return renderSubject();
+  if (view.screen === 'chapter') return renderChapter();
+  if (view.screen === 'exos')    return renderExos();
+  if (view.screen === 'edit')    return renderEdit();
+}
+
+function topbar(title, sub, backTo){
+  return `<div class="topbar">
+    ${backTo ? `<button class="back" data-back="1" aria-label="Retour">&#8592;</button>` : ''}
+    <div><h1>${esc(title)}</h1>${sub ? `<div class="sub">${esc(sub)}</div>` : ''}</div>
+  </div>`;
+}
+
+function searchAll(q){
+  const n = q.toLowerCase().trim();
+  if (n.length < 2) return [];
+  const res = [];
+  SUBJECTS.forEach(sb => chaps(sb.id).forEach((c,i) => {
+    const hay = [c.title, c.synthese || '', (c.notions || []).map(x => x.term + ' ' + x.def).join(' ')]
+      .join(' ').toLowerCase();
+    if (hay.indexOf(n) !== -1) res.push({ sb, c, i });
+  }));
+  return res;
+}
+
+function pinnedAll(){
+  const res = [];
+  SUBJECTS.forEach(sb => chaps(sb.id).forEach((c,i) => { if (c.pin) res.push({ sb, c, i }); }));
+  return res;
+}
+
+function renderHome(){
+  const isExo = mode === 'exos';
+  const total = SUBJECTS.reduce((n,s) => n + chaps(s.id).length, 0);
+  const totalExo = SUBJECTS.reduce((n,s) => n + chaps(s.id).reduce((m,c) => m + exosOf(c).length, 0), 0);
+  el.innerHTML = `<div class="wrap">` +
+    topbar(isExo ? 'Exercices' : 'Mes fiches',
+      isExo ? (totalExo ? `${totalExo} exercice${totalExo>1?'s':''} disponibles` : 'Première STMG')
+            : (total ? `${total} chapitre${total>1?'s':''} enregistré${total>1?'s':''}` : 'Première STMG')) +
+    `<div class="tabs">
+      <button class="tab ${isExo ? '' : 'on'}" data-mode="fiches">Mes fiches</button>
+      <button class="tab ${isExo ? 'on' : ''}" data-mode="exos">Exercices</button>
+    </div>
+    ${ isExo ? '' : `<div class="searchbox">
+      <input class="f" id="q" value="${esc(searchQ)}" placeholder="Chercher un mot dans toutes mes fiches">
+    </div>` }
+    ${ (!isExo && searchQ.trim().length >= 2) ? (() => {
+        const r = searchAll(searchQ);
+        return r.length
+          ? `<div class="reslist">` + r.map(x => `<button class="resrow" data-jump="${x.sb.id}|${x.c.id}">
+               <span class="rest">${esc(x.c.title)}</span>
+               <span class="resm">${esc(x.sb.name)}${x.c.group ? ' · ' + esc(x.c.group) : ''} · chapitre ${x.i+1}</span>
+             </button>`).join('') + `</div>`
+          : `<div class="hint" style="text-align:center;margin:18px 0">Aucune fiche ne contient ce mot.</div>`;
+      })() : '' }
+    ${ (!isExo && !searchQ.trim() && pinnedAll().length) ? `<div class="pinned">
+        <div class="rlab">Épinglé</div>` +
+        pinnedAll().map(x => `<button class="resrow" data-jump="${x.sb.id}|${x.c.id}">
+          <span class="rest">★ ${esc(x.c.title)}</span>
+          <span class="resm">${esc(x.sb.name)}</span>
+        </button>`).join('') + `</div>` : '' }
+    <div class="grid" ${ (!isExo && searchQ.trim().length >= 2) ? 'style="display:none"' : '' }>` +
+    SUBJECTS.map(s => {
+      const n = isExo ? chaps(s.id).reduce((m,c) => m + exosOf(c).length, 0) : chaps(s.id).length;
+      return `<button class="tile" data-subject="${s.id}">
+        <span>
+          <span class="dot" style="--tab:${s.tab}">${esc(s.ini)}</span>
+          <span class="name">${esc(s.name)}</span>
+        </span>
+        <span class="count">${ n ? n + (isExo ? ' exercice' : ' chapitre') + (n>1?'s':'') : 'Vide' }</span>
+      </button>`;
+    }).join('') + `</div>` +
+    ( isExo ? `<div class="hint" style="margin-top:22px;text-align:center">Choisis une matière, puis un chapitre : les définitions deviennent des cartes à retourner, et les exercices s'enchaînent.</div>`
+    : `<div class="row" style="justify-content:center;margin-top:24px">
+      <button class="btn ghost small" data-export="1">Sauvegarder dans un fichier</button>
+      <label class="filebtn" style="padding:9px 16px;font-size:13.5px">
+        Restaurer
+        <input type="file" accept="application/json,.json" id="restore">
+      </label>
+    </div>
+    <div class="hint" style="margin-top:16px;text-align:center">${
+      backend === 'claude' ? 'Fiches enregistrées dans Claude.'
+      : backend === 'local' ? 'Fiches enregistrées sur cet appareil, dans ce navigateur.'
+      : '⚠ Aucun enregistrement possible ici : tes fiches disparaîtront en fermant.'
+    }</div>` ) + `</div>`;
+  bind();
+}
+
+function chapRow(c, n){
+  return `<li><button class="chap" data-chapter="${c.id}">
+    <span class="num">${n}</span>
+    <span>
+      <span class="t">${c.pin ? '★ ' : ''}${esc(c.title)}</span>
+      <span class="meta">${ mode === 'exos'
+        ? (() => { const k = exosOf(c).length; return k ? k + ' exercice' + (k>1?'s':'') : 'Aucun exercice'; })()
+        : (c.notions||[]).length + ' notion' + ((c.notions||[]).length>1?'s':'') + (c.synthese ? ' · synthèse' : '') + ((c.images||[]).length ? ' · ' + c.images.length + ' schéma' + (c.images.length>1?'s':'') : '') }</span>
+    </span>
+  </button></li>`;
+}
+
+function renderSubject(){
+  const s = subj(view.subject), list = chaps(s.id);
+  const groups = GROUPS[s.id];
+  let body = '';
+
+  if (groups){
+    body = groups.map(g => {
+      const inGroup = list.filter(c => (c.group || groups[0]) === g);
+      return `<div class="group">
+        <div class="ghead">${esc(g)}</div>` +
+        KINDS.map(k => {
+          const sub = inGroup.filter(c => (c.kind || KINDS[0]) === k);
+          return `<div class="subsec">
+            <div class="shead">${esc(k)}</div>
+            ${ sub.length ? `<ul class="chapters">` + sub.map((c,i) => chapRow(c, i+1)).join('') + `</ul>`
+              : `<div class="gempty">Rien pour l'instant</div>` }
+            ${ mode === 'exos' ? '' : `<button class="btn ghost small" data-new="1" data-group="${esc(g)}" data-kind="${esc(k)}">Ajouter</button>` }
+          </div>`;
+        }).join('') +
+      `</div>`;
+    }).join('');
+  } else {
+    body = ( list.length ? `<ul class="chapters">` + list.map((c,i) => chapRow(c, i+1)).join('') + `</ul>`
+        : `<div class="empty"><p>Aucun chapitre ici</p><span class="s">Ajoute le premier ci-dessous.</span></div>` )
+      + ( mode === 'exos' ? '' : `<div class="addbar"><button class="btn" data-new="1">Ajouter un chapitre</button></div>` );
+  }
+
+  el.innerHTML = `<div class="wrap">` +
+    topbar(s.name, list.length ? `${list.length} chapitre${list.length>1?'s':''}` : '', true) +
+    body + `</div>`;
+  bind();
+}
+
+function renderChapter(){
+  const s = subj(view.subject);
+  const list = chaps(s.id);
+  const i = list.findIndex(c => c.id === view.chapter);
+  const c = list[i];
+  if (!c) return go({screen:'subject', subject:s.id});
+
+  const notions = c.notions || [];
+  const retenir = (c.retenir || '').split('\n').map(x => x.trim()).filter(Boolean);
+
+  el.innerHTML = `<div class="wrap">` +
+    topbar(s.name, `Chapitre ${i+1}`, true) +
+    `<article class="fiche">
+      <div class="fhead">
+        <span class="pill">${c.group ? esc(c.group) + ' · ' : ''}${c.kind ? esc(c.kind) + ' · ' : ''}${c.theme ? esc(c.theme) + ' · ' : ''}Chapitre ${i+1}</span>
+        <button class="pinbtn ${c.pin ? 'on' : ''}" data-pin="1" aria-label="Épingler">${c.pin ? '★' : '☆'}</button>
+      </div>
+      <h2>${esc(c.title)}</h2>
+
+      ${ c.synthese ? `<section class="sect"><h3>Synthèse</h3>${prose(c.synthese)}</section>` : '' }
+
+      ${ (c.images||[]).length ? `<section class="sect"><h3>Schémas</h3>` +
+          c.images.map(im => `<figure class="shot" style="margin:0 0 16px">
+            <img src="${im.data}" data-zoom="${im.id}" alt="${esc(im.caption||'Schéma')}">
+            ${im.caption ? `<figcaption class="cap">${esc(im.caption)}</figcaption>` : ''}
+          </figure>`).join('') + `</section>` : '' }
+
+      ${ (!notions.length && !c.synthese && !retenir.length && !(c.images||[]).length)
+        ? `<div class="empty" style="margin-top:24px;box-shadow:none;background:var(--beige)"><p>Fiche vide</p><span class="s">Ouvre la modification pour la remplir.</span></div>` : '' }
+
+      ${ pendingDelete === c.id
+        ? `<div class="confirm">
+             <p>Supprimer « ${esc(c.title)} » ? Cette fiche sera perdue.</p>
+             <button class="btn danger small" data-delyes="1">Oui, supprimer</button>
+             <button class="btn ghost small" data-delno="1">Annuler</button>
+           </div>`
+        : `<div class="row">
+             <button class="btn" data-edit="1">Modifier la fiche</button>
+             <button class="btn danger small" data-del="1">Supprimer</button>
+           </div>` }
+    </article></div>`;
+  bind();
+}
+
+/* ---------- exercices ---------- */
+let mode = 'fiches';
+let exoList = null, exoIdx = 0, exoShow = false, exoPick = null, exoWrong = [];
+let searchQ = '';
+
+function trousOf(c){
+  const out = [];
+  let inSchema = false;
+  String(c.synthese || '').split('\n').forEach(l => {
+    const t = l.trim();
+    if (t === '[schema]'){ inSchema = true; return; }
+    if (t === '[/schema]'){ inSchema = false; return; }
+    if (inSchema) return;
+    if (/^(#|\?|\||⚠)/.test(t)) return;
+    const marks = t.match(/==([^=]+)==/g);
+    if (!marks || marks.length > 3) return;
+    out.push({ type:'trou', q:t.replace(/==([^=]+)==/g, '______'), a:t });
+  });
+  return out.slice(0, 6);
+}
+
+function exosOf(c){
+  const out = [];
+  (c.notions || []).forEach(n => out.push({ type:'flash', q:n.term, a:n.def }));
+  trousOf(c).forEach(e => out.push(e));
+  (c.exos || []).forEach(e => out.push(e));
+  return out;
+}
+
+function shuffle(a){
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderExos(){
+  const s = subj(view.subject);
+  const c = chaps(s.id).find(x => x.id === view.chapter);
+  if (!c) return go({screen:'subject', subject:s.id});
+  if (!exoList) exoList = exosOf(c);
+
+  if (!exoList.length){
+    el.innerHTML = `<div class="wrap">` + topbar(c.title, 'Exercices', true) +
+      `<div class="empty"><p>Aucun exercice ici</p><span class="s">Les définitions de la fiche deviennent automatiquement des cartes. Ce chapitre n'en a pas encore.</span></div></div>`;
+    return bind();
+  }
+
+  const e = exoList[exoIdx];
+  const last = exoIdx === exoList.length - 1;
+  let card = '';
+
+  if (e.type === 'qcm'){
+    card = `<div class="exo-q">${hl(e.q)}</div><div class="opts">` +
+      e.options.map((o,i) => {
+        let cls = 'opt';
+        if (exoPick !== null){
+          if (i === e.correct) cls += ' good';
+          else if (i === exoPick) cls += ' bad';
+        }
+        return `<button class="${cls}" data-pick="${i}" ${exoPick !== null ? 'disabled' : ''}>${hl(o)}</button>`;
+      }).join('') + `</div>` +
+      ( exoPick !== null && e.a ? `<div class="exo-a"><div class="alab">Pourquoi</div>${hl(e.a)}</div>` : '' );
+  } else if (e.type === 'libre'){
+    card = `<div class="exo-q">${hl(e.q)}</div>
+      <textarea class="f" id="mine" style="min-height:120px" placeholder="Écris ta réponse, puis compare."></textarea>` +
+      ( exoShow ? `<div class="exo-a"><div class="alab">Réponse attendue</div>${hl(e.a)}</div>`
+        : `<button class="btn" data-reveal="1" style="margin-top:14px">Comparer avec la réponse</button>` );
+  } else if (e.type === 'trou'){
+    card = `<div class="exo-q trou">${esc(e.q)}</div>` +
+      ( exoShow ? `<div class="exo-a"><div class="alab">Texte complet</div>${hl(e.a)}</div>`
+        : `<button class="btn ghost" data-reveal="1" style="margin-top:18px">Voir les mots manquants</button>` );
+  } else {
+    card = `<div class="exo-q">${hl(e.q)}</div>` +
+      ( exoShow ? `<div class="exo-a">${hl(e.a)}</div>`
+        : `<button class="btn ghost" data-reveal="1" style="margin-top:16px">Voir la réponse</button>` );
+  }
+
+  el.innerHTML = `<div class="wrap">` +
+    topbar(c.title, `${exoIdx + 1} sur ${exoList.length}`, true) +
+    `<div class="pbar"><span style="width:${Math.round((exoIdx+1)/exoList.length*100)}%"></span></div>
+    <div class="exo ${e.type === 'flash' && !exoShow ? 'tapme' : ''}" ${e.type === 'flash' ? 'data-reveal="1"' : ''}>
+      <div class="exo-kind">${e.type === 'qcm' ? 'Question à choix' : e.type === 'libre' ? 'À rédiger' : e.type === 'trou' ? 'Texte à trous' : 'Carte'}</div>
+      ${card}
+    </div>
+    <div class="row" style="justify-content:space-between">
+      <button class="btn ghost small" data-prev="1" ${exoIdx === 0 ? 'disabled' : ''}>Précédent</button>
+      ${ last ? `<button class="btn small" data-restart="1">Recommencer</button>`
+             : `<button class="btn small" data-next="1">Suivant</button>` }
+    </div>
+    ${ last && exoWrong.length ? `<div class="retry"><div class="rlab">Tu t'es trompé ${exoWrong.length} fois</div>
+      <button class="btn" data-redo="1">Refaire mes erreurs</button></div>` : '' }
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn ghost small" data-shuffle="1">Mélanger</button>
+    </div></div>`;
+  bind();
+}
+
+function renderEdit(){
+  const s = subj(view.subject);
+  const isNew = !view.chapter;
+  el.innerHTML = `<div class="wrap">` +
+    topbar(s.name, isNew ? 'Nouveau chapitre' : 'Modification', true) +
+    `<label class="f" for="th">Thème</label>
+    <input class="f" id="th" value="${esc(draft.theme || '')}" placeholder="Ex. Thème 1 : Qu'est-ce que le droit ?">
+    <label class="f" for="t">Titre du chapitre</label>
+    <input class="f" id="t" value="${esc(draft.title)}" placeholder="Ex. Les sources du droit">` +
+
+    ( GROUPS[s.id] ? `<label class="f">Partie</label><div class="row" style="margin-top:0">` +
+        GROUPS[s.id].map(g => `<button class="btn ${ (draft.group || GROUPS[s.id][0]) === g ? '' : 'ghost' } small" data-setgroup="${esc(g)}">${esc(g)}</button>`).join('') +
+      `</div>
+      <label class="f">Type de fiche</label><div class="row" style="margin-top:0">` +
+        KINDS.map(k => `<button class="btn ${ (draft.kind || KINDS[0]) === k ? '' : 'ghost' } small" data-setkind="${esc(k)}">${esc(k)}</button>`).join('') +
+      `</div>` : '' ) +
+
+    `<label class="f">Notions clés</label>
+    <div id="notions">` +
+      draft.notions.map((n,i) => `
+        <div class="npair">
+          <input class="f" data-n="term" data-i="${i}" value="${esc(n.term)}" placeholder="Le terme">
+          <textarea class="f" data-n="def" data-i="${i}" placeholder="Sa définition">${esc(n.def)}</textarea>
+          <button class="btn ghost small" data-rmn="${i}">Retirer</button>
+        </div>`).join('') +
+    `</div>
+    <button class="btn ghost small" data-addn="1">Ajouter une notion</button>
+
+    <label class="f" for="sy">Synthèse</label>
+    <textarea class="f" id="sy" style="min-height:190px" placeholder="Le cours résumé, avec tes mots.">${esc(draft.synthese)}</textarea>
+    <div class="hint">Structure ton plan en début de ligne :<br>
+    <code># I - Titre</code> grande partie &nbsp;·&nbsp; <code>## A - Titre</code> sous-partie &nbsp;·&nbsp; <code>? Ta question</code><br>
+    Encadre un passage avec ==deux signes égal== pour le surligner.<br>
+    Pour un tableau, des lignes avec des barres verticales :<br>
+    <code>| Critère | Exemple |</code><br><code>| SARL | 2 associés minimum |</code><br>
+    La première ligne devient l'en-tête.</div>
+
+    <label class="f">Schémas (photos)</label>
+    <div class="thumbs">` +
+      draft.images.map((im,i) => `
+        <div class="thumb">
+          <img src="${im.data}" alt="">
+          <input class="f" data-cap="${i}" value="${esc(im.caption||'')}" placeholder="Légende">
+          <button class="btn ghost small" data-rmimg="${i}" style="width:100%">Retirer</button>
+        </div>`).join('') +
+    `</div>
+    <label class="filebtn" style="margin-top:12px">
+      Prendre ou choisir une photo
+      <input type="file" accept="image/*" id="pic">
+    </label>
+    <div class="hint">La photo est réduite automatiquement pour tenir dans l'application. Reste raisonnable : quelques schémas par fiche, pas des pages entières de cours.</div>
+
+    <label class="f" for="re">À retenir</label>
+    <textarea class="f" id="re" placeholder="Un point par ligne.">${esc(draft.retenir)}</textarea>
+    <div class="hint">Une ligne = une puce dans la fiche.</div>
+
+    <div class="row">
+      <button class="btn" data-save="1">Enregistrer</button>
+      <button class="btn ghost" data-cancel="1">Annuler</button>
+    </div></div>`;
+  bind();
+}
+
+function readDraft(){
+  const t = document.getElementById('t'), sy = document.getElementById('sy'), re = document.getElementById('re');
+  const th = document.getElementById('th');
+  if (th) draft.theme = th.value;
+  if (t)  draft.title = t.value;
+  if (sy) draft.synthese = sy.value;
+  if (re) draft.retenir = re.value;
+  document.querySelectorAll('[data-cap]').forEach(f => {
+    const i = +f.dataset.cap;
+    if (draft.images[i]) draft.images[i].caption = f.value;
+  });
+  document.querySelectorAll('[data-n]').forEach(f => {
+    const i = +f.dataset.i;
+    if (draft.notions[i]) draft.notions[i][f.dataset.n] = f.value;
+  });
+}
+
+function bind(){
+  const on = (sel, fn) => el.querySelectorAll(sel).forEach(b => b.addEventListener('click', fn));
+
+  on('[data-export]', () => {
+    try{
+      const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'mes-fiches-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      toast('Fichier de sauvegarde créé', true);
+    }catch(e){
+      toast('Téléchargement bloqué ici : ' + (e.message || e), false);
+    }
+  });
+
+  const rest = el.querySelector('#restore');
+  if (rest) rest.addEventListener('change', ev => {
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = async () => {
+      try{
+        const incoming = JSON.parse(r.result);
+        if (typeof incoming !== 'object') throw new Error('fichier illisible');
+        data = incoming;
+        await save(true);
+        toast('Fiches restaurées', true);
+        go({screen:'home'});
+      }catch(e){
+        toast('Restauration impossible : ' + (e.message || e), false);
+      }
+    };
+    r.readAsText(f);
+  });
+
+  on('[data-subject]', e => go({screen:'subject', subject:e.currentTarget.dataset.subject}));
+
+  const qi = el.querySelector('#q');
+  if (qi){
+    qi.addEventListener('input', ev => {
+      searchQ = ev.target.value;
+      render();
+      const f = el.querySelector('#q');
+      if (f){ f.focus(); f.setSelectionRange(searchQ.length, searchQ.length); }
+    });
+  }
+
+  on('[data-jump]', e => {
+    const [sid, cid] = e.currentTarget.dataset.jump.split('|');
+    searchQ = '';
+    go({screen:'chapter', subject:sid, chapter:cid});
+  });
+
+  on('[data-pin]', async () => {
+    const c = chaps(view.subject).find(x => x.id === view.chapter);
+    c.pin = !c.pin;
+    await save(true);
+    render();
+  });
+  on('[data-mode]', e => { mode = e.currentTarget.dataset.mode; go({screen:'home'}); });
+
+  on('[data-chapter]', e => {
+    const id = e.currentTarget.dataset.chapter;
+    if (mode === 'exos'){
+      const c = chaps(view.subject).find(x => x.id === id);
+      exoList = exosOf(c); exoIdx = 0; exoShow = false; exoPick = null; exoWrong = [];
+      return go({screen:'exos', subject:view.subject, chapter:id});
+    }
+    go({screen:'chapter', subject:view.subject, chapter:id});
+  });
+
+  on('[data-reveal]',  () => { exoShow = true; render(); });
+  on('[data-pick]',    e => {
+    exoPick = +e.currentTarget.dataset.pick;
+    const cur = exoList[exoIdx];
+    if (exoPick !== cur.correct && exoWrong.indexOf(cur) === -1) exoWrong.push(cur);
+    render();
+  });
+  on('[data-next]',    () => { exoIdx++; exoShow = false; exoPick = null; render(); window.scrollTo(0,0); });
+  on('[data-prev]',    () => { exoIdx--; exoShow = false; exoPick = null; render(); window.scrollTo(0,0); });
+  on('[data-restart]', () => { exoIdx = 0; exoShow = false; exoPick = null; render(); window.scrollTo(0,0); });
+  on('[data-shuffle]', () => { shuffle(exoList); exoIdx = 0; exoShow = false; exoPick = null; render(); window.scrollTo(0,0); });
+  on('[data-redo]',    () => { exoList = exoWrong.slice(); exoWrong = []; exoIdx = 0; exoShow = false; exoPick = null; render(); window.scrollTo(0,0); });
+
+
+  on('[data-back]', () => {
+    if (view.screen === 'subject') return go({screen:'home'});
+    if (view.screen === 'chapter') return go({screen:'subject', subject:view.subject});
+    if (view.screen === 'exos'){ exoList = null; return go({screen:'subject', subject:view.subject}); }
+    if (view.screen === 'edit'){
+      draft = null;
+      return view.chapter
+        ? go({screen:'chapter', subject:view.subject, chapter:view.chapter})
+        : go({screen:'subject', subject:view.subject});
+    }
+  });
+
+  on('[data-new]', e => {
+    const g = e.currentTarget.dataset.group || null;
+    const k = e.currentTarget.dataset.kind || null;
+    draft = { theme:'', title:'', notions:[{term:'',def:''}], synthese:'', retenir:'', images:[], group:g, kind:k };
+    go({screen:'edit', subject:view.subject, chapter:null});
+  });
+
+  on('[data-edit]', () => {
+    const c = chaps(view.subject).find(x => x.id === view.chapter);
+    draft = {
+      theme:c.theme || '',
+      title:c.title,
+      notions:(c.notions && c.notions.length) ? c.notions.map(n => ({term:n.term, def:n.def})) : [{term:'',def:''}],
+      synthese:c.synthese || '',
+      retenir:c.retenir || '',
+      images:(c.images || []).map(im => ({ id:im.id, data:im.data, caption:im.caption || '' })),
+      group:c.group || null,
+      kind:c.kind || null
+    };
+    go({screen:'edit', subject:view.subject, chapter:view.chapter});
+  });
+
+  on('[data-del]',   () => { pendingDelete = view.chapter; render(); window.scrollTo(0, document.body.scrollHeight); });
+  on('[data-delno]', () => { pendingDelete = null; render(); });
+  on('[data-delyes]', async () => {
+    data[view.subject] = chaps(view.subject).filter(x => x.id !== view.chapter);
+    pendingDelete = null;
+    await save();
+    go({screen:'subject', subject:view.subject});
+  });
+
+  on('[data-setgroup]', e => { readDraft(); draft.group = e.currentTarget.dataset.setgroup; render(); });
+  on('[data-setkind]',  e => { readDraft(); draft.kind  = e.currentTarget.dataset.setkind;  render(); });
+
+  on('[data-addn]', () => { readDraft(); draft.notions.push({term:'',def:''}); render(); });
+
+  on('[data-rmimg]', e => { readDraft(); draft.images.splice(+e.currentTarget.dataset.rmimg, 1); render(); });
+
+  on('[data-zoom]', e => {
+    const box = document.createElement('div');
+    box.className = 'lightbox';
+    const big = document.createElement('img');
+    big.src = e.currentTarget.src;
+    box.appendChild(big);
+    box.addEventListener('click', () => box.remove());
+    document.body.appendChild(box);
+  });
+
+  const pic = el.querySelector('#pic');
+  if (pic) pic.addEventListener('change', async ev => {
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    readDraft();
+    try{
+      const dataUrl = await compress(f);
+      draft.images.push({ id:uid(), data:dataUrl, caption:'' });
+      render();
+    }catch(err){
+      const d = document.createElement('div');
+      d.className = 'err';
+      d.textContent = 'Photo illisible. Essaie une autre image.';
+      pic.parentNode.parentNode.insertBefore(d, pic.parentNode.nextSibling);
+    }
+  });
+  on('[data-rmn]',  e => {
+    readDraft();
+    draft.notions.splice(+e.currentTarget.dataset.rmn, 1);
+    if (!draft.notions.length) draft.notions.push({term:'',def:''});
+    render();
+  });
+
+  on('[data-cancel]', () => {
+    draft = null;
+    view.chapter
+      ? go({screen:'chapter', subject:view.subject, chapter:view.chapter})
+      : go({screen:'subject', subject:view.subject});
+  });
+
+  on('[data-save]', async () => {
+    readDraft();
+    if (!draft.title.trim()){
+      const t = document.getElementById('t');
+      if (!document.getElementById('titleErr')){
+        const d = document.createElement('div');
+        d.className = 'err'; d.id = 'titleErr';
+        d.textContent = 'Donne un titre au chapitre avant d\u2019enregistrer.';
+        t.parentNode.insertBefore(d, t.nextSibling);
+      }
+      t.focus(); t.scrollIntoView({block:'center'});
+      return;
+    }
+    const clean = draft.notions.filter(n => n.term.trim() || n.def.trim());
+    const sid = view.subject;
+    if (!data[sid]) data[sid] = [];
+
+    if (view.chapter){
+      const c = data[sid].find(x => x.id === view.chapter);
+      Object.assign(c, { theme:(draft.theme||'').trim(), title:draft.title.trim(), notions:clean, synthese:draft.synthese, retenir:draft.retenir, images:draft.images, group:draft.group, kind:draft.kind });
+    } else {
+      const id = uid();
+      data[sid].push({ id, theme:(draft.theme||'').trim(), title:draft.title.trim(), notions:clean, synthese:draft.synthese, retenir:draft.retenir, images:draft.images, group:draft.group, kind:draft.kind });
+      view.chapter = id;
+    }
+    await save();
+    const cid = view.chapter;
+    draft = null;
+    go({screen:'chapter', subject:sid, chapter:cid});
+  });
+}
+
+load();
+</script>
